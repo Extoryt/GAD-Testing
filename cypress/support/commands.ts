@@ -34,4 +34,14 @@
 //       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
 //     }
 //   }
-// }
+// }'
+
+const alphanumeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+export const generateEmail = () => {
+  let email = '';
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * alphanumeric.length);
+    email += alphanumeric[randomIndex];
+  }
+  return email + '@example.com';
+};
