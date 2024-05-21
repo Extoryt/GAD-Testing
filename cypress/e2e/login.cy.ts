@@ -1,9 +1,26 @@
-describe('Login', () => {
-  it('happy path, should allow user to login ', () => {
+describe('Login - Happy Path, should allow users to login', () => {
+  const email = 'test@gmail.com';
+  const password = 'test';
+
+  beforeEach(() => {
     cy.visit('http://localhost:3000/login');
-    cy.get(':nth-child(2) > #username').type('test@gmail.com');
-    cy.get('#password').type('test');
+  });
+
+  it('login with checking the "keep me sign in" button ', () => {
+    cy.get(':nth-child(2) > #username').type(email);
+    cy.get('#password').type(password);
     cy.get('#keepSignIn').click();
+    cy.get('#loginButton').click();
+
+    cy.url({ timeout: 10000 }).should(
+      'include',
+      'http://localhost:3000/welcome'
+    );
+  });
+
+  it('login without checking the "keep me sign in" button', () => {
+    cy.get(':nth-child(2) > #username').type(email);
+    cy.get('#password').type(password);
     cy.get('#loginButton').click();
 
     cy.url({ timeout: 10000 }).should(
@@ -13,42 +30,41 @@ describe('Login', () => {
   });
 });
 
-describe('Login', () => {
-  it('happy path, without checking the "keep me sign in" button, should allow user to login', () => {
-    cy.visit('http://localhost:3000/login');
-    cy.get(':nth-child(2) > #username').type('test@gmail.com');
-    cy.get('#password').type('test');
-    cy.get('#loginButton').click();
+describe('Login - Unhappy Path, should not allow users to login', () => {
+  const email = 'test@gmail.com';
+  const password = 'test';
+  const wrongemail = 'wrongemail';
+  const wrongpassword = 'wrongpassword';
 
-    cy.url({ timeout: 10000 }).should(
-      'include',
-      'http://localhost:3000/welcome'
-    );
+  beforeEach(() => {
+    cy.visit('http://localhost:3000/login');
   });
-});
 
-describe('Login', () => {
-  it('unhappy path, login with wrong email address, should not allow user to login ', () => {
-    cy.visit('http://localhost:3000/login');
-    cy.get(':nth-child(2) > #username').type('wrongemail@gmail.com');
-    cy.get('#password').type('test');
-    cy.get('#keepSignIn').click();
+  it('login with wrong email address', () => {
+    cy.get(':nth-child(2) > #username').type(wrongemail);
+    cy.get('#password').type(password);
     cy.get('#loginButton').click();
+
+    cy.contains(
+      '[data-testid="login-error"]',
+      'Invalid username or password'
+    ).should('be.visible');
 
     cy.url({ timeout: 10000 }).should(
       'include',
       'http://localhost:3000/login/?msg=Invalid%20username%20or%20password'
     );
   });
-});
 
-describe('Login', () => {
-  it('unhappy path, login with wrong password, should not allow user to login ', () => {
-    cy.visit('http://localhost:3000/login');
-    cy.get(':nth-child(2) > #username').type('test@gmail.com');
-    cy.get('#password').type('wrongpassword');
-    cy.get('#keepSignIn').click();
+  it('login with wrong password', () => {
+    cy.get(':nth-child(2) > #username').type(email);
+    cy.get('#password').type(wrongpassword);
     cy.get('#loginButton').click();
+
+    cy.contains(
+      '[data-testid="login-error"]',
+      'Invalid username or password'
+    ).should('be.visible');
 
     cy.url({ timeout: 10000 }).should(
       'include',
