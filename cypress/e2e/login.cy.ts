@@ -1,10 +1,12 @@
 import {
   checkFailedLogin,
-  loggingCookiesCheck,
+  checkLoggingCookies,
   loginData,
 } from '../support/commands';
+
 describe('Login - Happy Path, should allow users to login', () => {
   beforeEach(() => {
+    cy.visit('login');
     loginData();
   });
 
@@ -13,8 +15,8 @@ describe('Login - Happy Path, should allow users to login', () => {
     cy.get('#loginButton').click();
     cy.url({ timeout: 10000 }).should('include', '/welcome');
     // Checking cookies ater log-in, deleting cookies after log-in
-    loggingCookiesCheck();
-    cy.visit('http://localhost:3000/login');
+    checkLoggingCookies();
+    cy.visit('login');
   });
 
   it('login without checking the "keep me sign in" button', () => {
@@ -25,7 +27,7 @@ describe('Login - Happy Path, should allow users to login', () => {
 
 describe('Login - Unhappy Path, should not allow users to login', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/login');
+    cy.visit('login');
   });
   it('login with wrong email address', () => {
     cy.get(':nth-child(2) > #username').type('wrongemail');

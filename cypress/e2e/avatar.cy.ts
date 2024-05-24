@@ -1,16 +1,15 @@
 import {
-  generateEmail,
-  fillRegistrationForm,
-  submitRegistrationForm,
+  registration,
   defaultLogin,
+  checkAvatar,
 } from '../support/commands';
-let email: string;
-email = generateEmail();
-// wartosc z avatara (ciasteczko cookie)
+
+beforeEach(() => {
+  cy.visit('register.html');
+});
+
 describe('Avatar', () => {
   it('checking avatar changes', () => {
-    cy.visit('http://localhost:3000/register.html');
-
     cy.get('.avatar')
       .find('option')
       .then((options) => {
@@ -22,16 +21,14 @@ describe('Avatar', () => {
 
         // Registration
 
-        fillRegistrationForm();
-        submitRegistrationForm();
+        registration();
 
         // Logging
 
         defaultLogin();
 
-        // Logout
-
-        cy.get('[data-testid="logoutButton"]').click();
+        // Checking if avatar src is equal to cookie "avatar" value
+        checkAvatar();
       });
   });
 });

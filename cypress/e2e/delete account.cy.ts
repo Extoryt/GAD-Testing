@@ -1,15 +1,9 @@
-import {
-  generateEmail,
-  userLogin,
-  checkAccountDeletion,
-} from '../support/commands';
+import { checkAccountDeletion, registerAndLogin } from '../support/commands';
 
 describe('Delete account', () => {
-  let email: string;
-
   beforeEach(() => {
-    email = generateEmail();
-    userLogin();
+    cy.visit('register.html');
+    registerAndLogin();
   });
 
   const confirmDelete = (confirmation: boolean) => {
@@ -22,15 +16,12 @@ describe('Delete account', () => {
 
   it('should allow users to delete their accounts', () => {
     confirmDelete(true);
-    cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/login');
+    cy.url({ timeout: 10000 }).should('include', 'login');
     checkAccountDeletion();
   });
 
   it('should allow users to cancel their delete account request', () => {
     confirmDelete(false);
-    cy.url({ timeout: 10000 }).should(
-      'include',
-      'http://localhost:3000/welcome'
-    );
+    cy.url({ timeout: 10000 }).should('include', 'welcome');
   });
 });

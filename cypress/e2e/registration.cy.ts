@@ -1,5 +1,4 @@
 import {
-  generateEmail,
   registerFailedCheck,
   registerFailedData,
   registerSuccessfullCheck,
@@ -8,11 +7,10 @@ import {
 } from '../support/commands';
 
 describe('Registration - Happy Path, should allow users to sign up', () => {
-  let email: string;
   let birthdate = '1995-10-05';
 
   beforeEach(() => {
-    email = generateEmail();
+    cy.visit('register.html');
     registerSuccessfullData();
   });
 
@@ -44,10 +42,9 @@ describe('Registration - Happy Path, should allow users to sign up', () => {
 
 describe('Registration - Unhappy Path, should not allow users to sign up', () => {
   let email: string;
-  let data = 'test';
 
   beforeEach(() => {
-    email = generateEmail();
+    cy.visit('register.html');
     registerFailedData();
   });
 

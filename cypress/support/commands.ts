@@ -57,105 +57,49 @@ export const generateEmail = () => {
 
 // -------------------------Integration Testing--------------------------------------------
 beforeEach(() => {
-  cy.visit('http://localhost:3000/register.html');
-  email = generateEmail();
   cy.intercept('POST', '/api/users').as('createUser');
+  email = generateEmail();
 });
+
 // Registration
 
-export const fillRegistrationForm = () => {
-  cy.visit('http://localhost:3000/register.html');
-  cy.intercept('POST', '/api/users').as('createUser');
-
+export const registration = () => {
   cy.get('[data-testid="firstname-input"]').type(data);
   cy.get('[data-testid="lastname-input"]').type(data);
   cy.get('[data-testid="email-input"]').type(email);
   cy.get('[data-testid="birthdate-input"]').click();
   cy.get(':nth-child(1) > :nth-child(5) > .ui-state-default').click();
   cy.get('[data-testid="password-input"]').type(data);
-};
-export const submitRegistrationForm = () => {
   cy.get('[data-testid="register-button"]').click();
   cy.wait('@createUser').its('response.statusCode').should('eq', 201);
   cy.contains('.alert-success', 'User created').should('be.visible');
-  cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/login/');
+  cy.url({ timeout: 10000 }).should('include', 'login/');
 };
+
 // userLogin
 
 export const userLogin = () => {
   describe('userLogin', () => {
     // Registration
-    cy.intercept('POST', '/api/users').as('createUser');
-    cy.visit('http://localhost:3000/register.html');
-    cy.get('[data-testid="firstname-input"]').type(data);
-    cy.get('[data-testid="lastname-input"]').type(data);
-    cy.get('[data-testid="email-input"]').type(email);
-    cy.get('[data-testid="birthdate-input"]').click();
-    cy.get(':nth-child(1) > :nth-child(5) > .ui-state-default').click();
-    cy.get('[data-testid="password-input"]').type(data);
-
-    cy.get('[data-testid="register-button"]').click();
-
-    cy.wait('@createUser').its('response.statusCode').should('eq', 201);
-    cy.contains('.alert-success', 'User created').should('be.visible');
-
-    cy.url({ timeout: 10000 }).should(
-      'include',
-      'http://localhost:3000/login/'
-    );
+    registerSuccessfullData();
+    registerSuccessfullCheck();
 
     // Logging
 
-    cy.get(':nth-child(2) > #username').type(email);
-    cy.get('#password').type(data);
-    cy.get('#loginButton').click();
-
-    cy.url({ timeout: 10000 }).should(
-      'include',
-      'http://localhost:3000/welcome'
-    );
-  });
-};
-// Checking cookies after logging
-export const loggingCookies = () => {
-  describe('cookies', () => {
-    // Registration
-
-    fillRegistrationForm();
-    submitRegistrationForm();
-    // Logging
     defaultLogin();
-
-    // Checking added cookies after logging in
-
-    loggingCookiesCheck();
+    checkLoggingCookies();
   });
 };
-// Checking cookies after logout
-export const logoutCookies = () => {
-  cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/login');
-  cy.getCookies()
-    .should('have.length', 1)
-    .then((cookies) => {
-      const expectedCookieName = ['expires'];
-      expectedCookieName.forEach((cookieName) => {
-        const cookie = cookies.find((cookie) => cookie.name === cookieName);
-        expect(cookie, `Cookie '${cookieName}'`).to.exist;
-      });
-      cy.url({ timeout: 10000 }).should(
-        'include',
-        'http://localhost:3000/login'
-      );
-    });
-};
-
-export const logout = () => {
+// userLogout
+export const userLogout = () => {
   // Registration
-  fillRegistrationForm();
-  submitRegistrationForm();
+  registerSuccessfullData();
+  registerSuccessfullCheck();
 
   // Logging
   defaultLogin();
+  cy.get('[data-testid="logoutButton"]').click();
+  checkLogoutCookies();
 };
 
 // Deleting account
@@ -163,17 +107,12 @@ export const logout = () => {
 export const deleteAccount = () => {
   // Registration
 
-  fillRegistrationForm();
-  submitRegistrationForm();
+  registerSuccessfullData();
+  registerSuccessfullCheck();
 
   // Login
 
-  cy.get(':nth-child(2) > #username').type(email);
-  cy.get('#password').type(data);
-
-  cy.get('#loginButton').click();
-
-  cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/welcome');
+  defaultLogin();
 
   // Confirmation of account deletion
   cy.get('[data-testid="deleteButton"]').click();
@@ -183,17 +122,10 @@ export const deleteAccount = () => {
     return true;
   });
 
-  cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/login');
+  cy.url({ timeout: 10000 }).should('include', 'login');
 
   // Checking if a user can log in to a deleted account
-  cy.get(':nth-child(2) > #username').type(email);
-  cy.get('#password').type(data);
-  cy.get('#loginButton').click();
-
-  cy.url({ timeout: 10000 }).should(
-    'include',
-    'http://localhost:3000/login/?msg=Invalid%20username%20or%20password'
-  );
+  checkAccountDeletion();
 };
 
 export const avatar = () => {
@@ -207,38 +139,25 @@ export const avatar = () => {
       cy.get('.avatar').select(0).should('have.value', options[0].value);
 
       // Registration
-
-      cy.get('[data-testid="firstname-input"]').type(data);
-      cy.get('[data-testid="lastname-input"]').type(data);
-      cy.get('[data-testid="email-input"]').type(email);
-      cy.get('[data-testid="birthdate-input"]').click();
-      cy.get(':nth-child(1) > :nth-child(5) > .ui-state-default').click();
-      cy.get('[data-testid="password-input"]').type(data);
-
-      cy.get('[data-testid="register-button"]').click();
-
-      cy.wait('@createUser').its('response.statusCode').should('eq', 201);
-      cy.contains('.alert-success', 'User created').should('be.visible');
-
-      cy.url({ timeout: 10000 }).should(
-        'include',
-        'http://localhost:3000/login/'
-      );
+      registerSuccessfullData();
+      registerSuccessfullCheck();
 
       // Logging
 
-      cy.get(':nth-child(2) > #username').type(email);
-      cy.get('#password').type(data);
-      cy.get('#loginButton').click();
+      defaultLogin();
 
-      cy.url({ timeout: 10000 }).should(
-        'include',
-        'http://localhost:3000/welcome'
-      );
+      // Checking if avatar src is equal to cookie "avatar" value
+      cy.getCookie('avatar').then((cookie) => {
+        const cookieSrc = cookie ? decodeURIComponent(cookie.value) : '';
+        cy.get('#myAvatar')
+          .invoke('attr', 'src')
+          .then((imgSrc) => {
+            const cookieFilename = cookieSrc.split('\\').pop();
+            const imgFilename = imgSrc.split('\\').pop();
 
-      // Logout
-
-      cy.get('[data-testid="logoutButton"]').click();
+            expect(imgFilename).to.equal(cookieFilename);
+          });
+      });
     });
 };
 // -------------------------------Testing------------------------------------------
@@ -246,13 +165,13 @@ export const avatar = () => {
 export const loginData = () => {
   let email = 'test@gmail.com';
   let password = 'test';
-  cy.visit('http://localhost:3000/login');
+  cy.visit('login');
   cy.get(':nth-child(2) > #username').type(email);
   cy.get('#password').type(password);
 };
 
 // Checking cookies after logging in
-export const loggingCookiesCheck = () => {
+export const checkLoggingCookies = () => {
   cy.getCookies()
     .should('have.length', 7)
     .then((cookies) => {
@@ -271,7 +190,7 @@ export const loggingCookiesCheck = () => {
       });
     });
 
-  cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/welcome');
+  cy.url({ timeout: 10000 }).should('include', 'welcome');
 
   // Deleting cookies after logging in
 
@@ -279,7 +198,22 @@ export const loggingCookiesCheck = () => {
 
   cy.getCookies().should('have.length', 0);
 
-  cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/welcome');
+  cy.url({ timeout: 10000 }).should('include', 'welcome');
+};
+
+// Checking cookies after logout
+export const checkLogoutCookies = () => {
+  cy.url({ timeout: 10000 }).should('include', 'login');
+  cy.getCookies()
+    .should('have.length', 1)
+    .then((cookies) => {
+      const expectedCookieName = ['expires'];
+      expectedCookieName.forEach((cookieName) => {
+        const cookie = cookies.find((cookie) => cookie.name === cookieName);
+        expect(cookie, `Cookie '${cookieName}'`).to.exist;
+      });
+      cy.url({ timeout: 10000 }).should('include', 'login');
+    });
 };
 // Checking login with wrong data
 export const checkFailedLogin = () =>
@@ -296,7 +230,7 @@ export const checkAccountDeletion = () => {
 
   cy.url({ timeout: 10000 }).should(
     'include',
-    'http://localhost:3000/login/?msg=Invalid%20username%20or%20password'
+    'login/?msg=Invalid%20username%20or%20password'
   );
 };
 // Logging
@@ -305,14 +239,11 @@ export const defaultLogin = () => {
   cy.get('#password').type(data);
   cy.get('#loginButton').click();
 
-  cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/welcome');
+  cy.url({ timeout: 10000 }).should('include', 'welcome');
 };
 
 // Registration with wrong data
 export const registerFailedData = () => {
-  cy.visit('http://localhost:3000/register.html');
-  cy.intercept('POST', '/api/users').as('createUser');
-
   cy.get('[data-testid="firstname-input"]').type(data);
   cy.get('[data-testid="lastname-input"]').type(data);
   cy.get('[data-testid="email-input"]').type(email);
@@ -327,11 +258,8 @@ export const registerFailedCheck = () => {
   );
 };
 
-// registration with good data
+// Registration with correct data
 export const registerSuccessfullData = () => {
-  cy.visit('http://localhost:3000/register.html');
-  cy.intercept('POST', '/api/users').as('createUser');
-
   cy.get('[data-testid="firstname-input"]').type(data);
   cy.get('[data-testid="lastname-input"]').type(data);
   cy.get('[data-testid="email-input"]').type(email);
@@ -346,7 +274,7 @@ export const registerSuccessfullCheck = () => {
   cy.wait('@createUser').its('response.statusCode').should('eq', 201);
   cy.contains('.alert-success', 'User created').should('be.visible');
 
-  cy.url({ timeout: 10000 }).should('include', 'http://localhost:3000/login/');
+  cy.url({ timeout: 10000 }).should('include', 'login');
 };
 
 export const registerWithAllDataBlank = () => {
@@ -354,4 +282,28 @@ export const registerWithAllDataBlank = () => {
   cy.get('[data-testid="lastname-input"]').clear();
   cy.get('[data-testid="email-input"]').clear();
   cy.get('[data-testid="password-input"]').clear();
+};
+
+export const registerAndLogin = () => {
+  // Registration
+  registerSuccessfullData();
+  registerSuccessfullCheck();
+
+  // Logging
+  defaultLogin();
+};
+
+export const checkAvatar = () => {
+  // Checking if avatar src is equal to cookie "avatar" value
+  cy.getCookie('avatar').then((cookie) => {
+    const cookieSrc = cookie ? decodeURIComponent(cookie.value) : '';
+    cy.get('#myAvatar')
+      .invoke('attr', 'src')
+      .then((imgSrc) => {
+        const cookieFilename = cookieSrc.split('\\').pop();
+        const imgFilename = imgSrc.split('\\').pop();
+
+        expect(imgFilename).to.equal(cookieFilename);
+      });
+  });
 };

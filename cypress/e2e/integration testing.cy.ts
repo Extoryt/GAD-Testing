@@ -1,19 +1,15 @@
 import {
-  fillRegistrationForm,
-  submitRegistrationForm,
+  registration,
   userLogin,
-  loggingCookies,
-  logout,
+  userLogout,
   deleteAccount,
   avatar,
-  logoutCookies,
 } from '../support/commands';
 
 describe('Integration testing - Happy Path', () => {
   // Registration
   it('Registration', () => {
-    fillRegistrationForm();
-    submitRegistrationForm();
+    registration();
   });
 
   // Logging, checking added cookies after login and deleting cookies after login
@@ -23,7 +19,7 @@ describe('Integration testing - Happy Path', () => {
 
   // Logout, checking cookies after logout
   it('Logout', () => {
-    logout();
+    userLogout();
   });
 
   // Deleting account
