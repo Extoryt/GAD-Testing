@@ -14,14 +14,17 @@ describe('Login - Happy Path, should allow users to login', () => {
     cy.get('#keepSignIn').click();
     cy.get('#loginButton').click();
     cy.url({ timeout: 10000 }).should('include', '/welcome');
-    // Checking cookies ater log-in, deleting cookies after log-in
+    // Checking cookies ater log-in, checking whether the user has been logged out after deleting cookies
     checkLoggingCookies();
-    cy.visit('login');
+    cy.get('[data-testid="open-articles"]').click();
+    cy.get('#avatar')
+      .invoke('attr', 'src')
+      .should('equal', './data/icons/user.png');
   });
 
   it('login without checking the "keep me sign in" button', () => {
     cy.get('#loginButton').click();
-    cy.url({ timeout: 10000 }).should('include', '/welcome');
+    cy.url({ timeout: 10000 }).should('include', 'welcome');
   });
 });
 
