@@ -1,56 +1,39 @@
-import {
-  checkFailedLogin,
-  checkLoggingCookies,
-  loginData,
-} from '../support/commands';
+import { checkCookiesAfterLogin, checkDeletingCookiesAfterLogin, checkUserLogin, userLogin } from '../support/commands';
 
 describe('Login - Happy Path, should allow users to login', () => {
-  beforeEach(() => {
-    cy.visit('login');
-    loginData();
-  });
+	beforeEach(() => {
+		cy.visit('login');
+		userLogin(true);
+	});
 
-  it('login with checking the "keep me sign in" button, checking and deleting cookies after logging', () => {
-    cy.get('#keepSignIn').click();
-    cy.get('#loginButton').click();
-    cy.url({ timeout: 10000 }).should('include', '/welcome');
-    // Checking cookies ater log-in, checking whether the user has been logged out after deleting cookies
-    checkLoggingCookies();
-    cy.get('[data-testid="open-articles"]').click();
-    cy.get('#avatar')
-      .invoke('attr', 'src')
-      .should('equal', './data/icons/user.png');
-  });
+	it('login with checking the "keep me sign in" button, checking cookies', () => {
+		// verify that the user was correctly logged in, while logging click the “keep me sign in” button
+		checkUserLogin(true, true);
+		// Checking cookies ater log-in, checking whether the user has been logged out after deleting cookies
+		checkCookiesAfterLogin();
+		checkDeletingCookiesAfterLogin();
+	});
 
-  it('login without checking the "keep me sign in" button', () => {
-    cy.get('#loginButton').click();
-    cy.url({ timeout: 10000 }).should('include', 'welcome');
-  });
+	it('login without checking the "keep me sign in" button', () => {
+		// verify that the user was correctly logged in
+		checkUserLogin(true, false);
+	});
 });
 
 describe('Login - Unhappy Path, should not allow users to login', () => {
-  beforeEach(() => {
-    cy.visit('login');
-  });
-  it('login with wrong email address', () => {
-    cy.get(':nth-child(2) > #username').type('wrongemail');
-    cy.get('#loginButton').click();
+	beforeEach(function () {
+		cy.visit('login');
+		cy.fixture('userData').as('loginData');
+	});
+	afterEach(() => {
+		checkUserLogin(false, false);
+	});
 
-    checkFailedLogin();
-    cy.url({ timeout: 10000 }).should(
-      'include',
-      'login/?msg=Invalid%20username%20or%20password'
-    );
-  });
+	it('login with wrong email address', function () {
+		cy.get(':nth-child(2) > #username').type(this.loginData.wrongEmail);
+	});
 
-  it('login with wrong password', () => {
-    cy.get('#password').type('wrongpassword');
-    cy.get('#loginButton').click();
-
-    checkFailedLogin();
-    cy.url({ timeout: 10000 }).should(
-      'include',
-      'login/?msg=Invalid%20username%20or%20password'
-    );
-  });
+	it('login with wrong password', function () {
+		cy.get('#password').type(this.loginData.wrongPassword);
+	});
 });
