@@ -29,9 +29,7 @@ describe('Registration - Happy Path, should allow users to sign up', () => {
 	it('a registration without birth date', () => {});
 });
 
-describe.only('Registration - Unhappy Path, should not allow users to sign up', () => {
-	let email: string;
-
+describe('Registration - Unhappy Path, should not allow users to sign up', () => {
 	beforeEach(() => {
 		cy.visit('register.html');
 		userRegistration();
