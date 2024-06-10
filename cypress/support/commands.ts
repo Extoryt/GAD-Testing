@@ -202,3 +202,10 @@ export const checkAvatar = () => {
 			});
 	});
 };
+
+export const requiredFields = [
+	'#octavalidate_firstname',
+	'#octavalidate_lastname',
+	'#octavalidate_email',
+	'#octavalidate_password'
+];

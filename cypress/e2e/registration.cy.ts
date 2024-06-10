@@ -1,4 +1,9 @@
-import { userRegistration, checkUserRegistration, registrationWithAllDataBlank } from '../support/commands';
+import {
+	userRegistration,
+	checkUserRegistration,
+	registrationWithAllDataBlank,
+	requiredFields,
+} from '../support/commands';
 
 describe('Registration - Happy Path, should allow users to sign up', () => {
 	let birthdate = '1995-10-05';
@@ -52,21 +57,24 @@ describe('Registration - Unhappy Path, should not allow users to sign up', () =>
 		cy.get('[data-testid="firstname-input"]').clear();
 		checkUserRegistration(false);
 
-		cy.contains('#octavalidate_firstname', 'This field is required').should('be.visible');
+		const firstNameFieldSelector = requiredFields[0]; // #octavalidate_firstname
+		cy.get(firstNameFieldSelector).contains('This field is required').should('be.visible');
 	});
 
 	it('a registration without last name', () => {
 		cy.get('[data-testid="lastname-input"]').clear();
 		checkUserRegistration(false);
 
-		cy.contains('#octavalidate_lastname', 'This field is required').should('be.visible');
+		const lastNameFieldSelector = requiredFields[1]; // #octavalidate_lastname
+		cy.get(lastNameFieldSelector).contains('This field is required').should('be.visible');
 	});
 
 	it('a registration without email', () => {
 		cy.get('[data-testid="email-input"]').clear();
 		checkUserRegistration(false);
 
-		cy.contains('#octavalidate_email', 'This field is required').should('be.visible');
+		const emailFieldSelector = requiredFields[2]; // #octavalidate_email
+		cy.get(emailFieldSelector).contains('This field is required').should('be.visible');
 	});
 
 	it('a registration without "@" in email', () => {
@@ -74,22 +82,24 @@ describe('Registration - Unhappy Path, should not allow users to sign up', () =>
 			cy.get('[data-testid="email-input"]').clear().type(loginData.invalidEmail);
 			checkUserRegistration(false);
 		});
-		cy.contains('#octavalidate_email', 'Please provide a valid email address').should('be.visible');
+		const emailFieldSelector = requiredFields[2]; // #octavalidate_email
+		cy.get(emailFieldSelector).contains('Please provide a valid email address').should('be.visible');
 	});
 
 	it('a registration without password', () => {
 		cy.get('[data-testid="password-input"]').clear();
 		checkUserRegistration(false);
 
-		cy.contains('#octavalidate_password', 'This field is required').should('be.visible');
+		const passwordFieldSelector = requiredFields[3]; // #octavalidate_password
+		cy.get(passwordFieldSelector).contains('This field is required').should('be.visible');
 	});
 
 	it('a registration with all data blank', () => {
 		registrationWithAllDataBlank();
 
 		checkUserRegistration(false);
-		cy.get('#octavalidate_firstname, #octavalidate_lastname, #octavalidate_email, #octavalidate_password').each($el => {
-			cy.wrap($el).contains('This field is required').should('be.visible');
+		requiredFields.forEach(selector => {
+			cy.get(selector).contains('This field is required').should('be.visible');
 		});
 	});
 });
