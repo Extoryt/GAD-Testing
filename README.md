@@ -4,7 +4,7 @@ Aplikacja z instrukcją do pobrania i uruchomienia znajduję się tutaj: https:/
 
 ## Testy aplikacji GAD
 
-Aby uruchomić testy w terminalu w katalogu **GAD-Testing** wpisz:
+Aby uruchomić testy sklonuj repozytorium **GAD-Testing** na swój komputer. Następnie wejdź używając terminala do tego katalogu i wpisz:
 
 ```
 npm install
