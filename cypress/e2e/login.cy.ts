@@ -16,7 +16,7 @@ describe('Login - Happy Path, should allow users to login', () => {
 
 	it('login without checking the "keep me sign in" button', () => {
 		// verify that the user was correctly logged in
-		checkUserLogin(true, false);
+		checkUserLogin(false, true);
 	});
 });
 

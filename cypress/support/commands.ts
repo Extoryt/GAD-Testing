@@ -126,7 +126,7 @@ export const userLogin = (specificData: boolean) => {
 	}
 };
 
-export const checkUserLogin = (successful: boolean, checkKeepSignIn: boolean) => {
+export const checkUserLogin = (checkKeepSignIn: boolean, successful: boolean) => {
 	if (checkKeepSignIn) {
 		cy.get('#keepSignIn').click();
 		cy.get('#loginButton').click();
